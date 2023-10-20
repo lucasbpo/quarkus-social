@@ -2,7 +2,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.9.10"
+    kotlin("plugin.jpa") version "1.9.10"
     kotlin("plugin.allopen") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
     id("io.quarkus")
 }
 
@@ -16,23 +18,24 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
-    implementation(kotlin("stdlib"))
-
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 
+    implementation(kotlin("stdlib"))
     implementation("io.quarkus:quarkus-kotlin")
-    implementation("io.quarkus:quarkus-resteasy-jsonb")
+    implementation("io.quarkus:quarkus-arc")
+    implementation("io.quarkus:quarkus-reactive-pg-client")
+    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
+    implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
+    implementation("io.quarkus:quarkus-resteasy-reactive-links")
     implementation("io.quarkus:quarkus-hibernate-validator")
-    implementation("io.quarkus:quarkus-hibernate-orm")
-    implementation("io.quarkus:quarkus-hibernate-orm-panache")
-    implementation("io.quarkus:quarkus-jdbc-h2")
+    implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
 
 group = "br.com.lucasbpo"
-version = "1.0.0-SNAPSHOT"
+version = "0.0.1-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -41,6 +44,7 @@ java {
 
 allOpen {
     annotation("jakarta.ws.rs.Path")
+    annotation("jakarta.persistence.Entity")
     annotation("jakarta.enterprise.context.ApplicationScoped")
     annotation("io.quarkus.test.junit.QuarkusTest")
 }
@@ -51,6 +55,6 @@ tasks.withType<Test> {
 
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     kotlinOptions.javaParameters = true
 }
